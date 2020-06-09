@@ -1,16 +1,20 @@
 // HPC490_LaneDetection.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace cv;
 using namespace std;
 
-void drawTwoCirclesDemo();
 void videoPlaybackDemo();
+void cannyFrame(Mat);
+void CannyThreshold(int, void*, Mat, Mat&);
 
 int main()
 {
@@ -18,19 +22,8 @@ int main()
 
 	videoPlaybackDemo();
 
-	drawTwoCirclesDemo();
-
 	return 0;
 
-}
-
-void drawTwoCirclesDemo()
-{
-	Mat image = Mat::zeros(300, 600, CV_8UC3);
-	circle(image, Point(250, 150), 100, Scalar(0, 255, 128), -100);
-	circle(image, Point(350, 150), 100, Scalar(255, 255, 255), -100);
-	imshow("Two Cool Circles!", image);
-	waitKey(0);
 }
 
 void videoPlaybackDemo()
@@ -59,9 +52,56 @@ void videoPlaybackDemo()
 		}
 		// Show live and wait for a key with timeout long enough to show images
 		imshow("Live", frame);
+		
+		cannyFrame(frame);
+
 		if (waitKey(33) >= 0)  // 30 fps
 			break;
 	}
 
 	// The camera is deinitialized automatically in VideoCapture destructor
+}
+
+void cannyFrame(Mat frame)
+{
+	Mat src_gray;
+	Mat dst;
+
+	/// Create a matrix of the same type and size as src (for dst)
+	dst.create(frame.size(), frame.type());
+
+	/// Convert the image to grayscale
+	cvtColor(frame, src_gray, CV_BGR2GRAY);
+
+	/// Create a window
+	//namedWindow("Canny Frame Test", CV_WINDOW_AUTOSIZE);
+
+	/// Show the image
+	CannyThreshold(0, 0, src_gray, dst);
+}
+
+int edgeThresh = 1;
+int lowThreshold = 80;  // The bigger the number, the less edges detected
+int const max_lowThreshold = 100;
+int iratio = 3;
+int kernel_size = 3;
+
+void CannyThreshold(int, void*, Mat input, Mat& output)
+{
+	Mat detected_edges; 
+
+	/// Reduce noise with a kernel 3x3
+	blur(input, detected_edges, Size(3, 3));
+
+	/// Canny detector
+	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * iratio, kernel_size);
+
+	/// Using Canny's output as a mask, we display our result
+	output = Scalar::all(0);
+
+	//src.copyTo(output, detected_edges);
+	input.copyTo(output, detected_edges);
+
+	imshow("Canny Threshold Test", output);
+
 }
