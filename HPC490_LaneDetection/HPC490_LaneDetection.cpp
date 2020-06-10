@@ -139,7 +139,13 @@ void hough(Mat frame)
 		pt1.y = cvRound(y0 + 1000 * (a));
 		pt2.x = cvRound(x0 - 1000 * (-b));
 		pt2.y = cvRound(y0 - 1000 * (a));
-		line(output, pt1, pt2, Scalar(0, 0, 255), 3, LINE_AA);
+
+		double slope = (pt2.y - pt1.y) / (double)(pt2.x - pt1.x);
+
+		// Ensure the lines are within a reasonable bound
+		if (abs(slope) > 0.5 && abs(slope) < 5)
+			line(output, pt1, pt2, Scalar(0, 0, 255), 2, LINE_AA);
+
 	}
 
 	// Show results
