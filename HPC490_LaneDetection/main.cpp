@@ -63,7 +63,7 @@ void VideoDemo()
 			break;
 		}
 		// Show live and wait for a key with timeout long enough to show images
-		imshow("Live", frame);
+		//imshow("Live", frame);
 		
 		//CannyEdgeDetect(frame);
 
@@ -183,13 +183,15 @@ void HoughTransform(Mat frame, const Mat orig)
 		}
 	}
 
+	Mat overlay(orig, Rect(0, orig.rows / 2, orig.cols, orig.rows / 2));
+
 	if (numLeft > 0)
 	{
 		avgLeftTop.x = sumLeftTopx / numLeft;
 		avgLeftTop.y = sumLeftTopy / numLeft;
 		avgLeftBot.x = sumLeftBotx / numLeft;
 		avgLeftBot.y = sumLeftBoty / numLeft;
-		line(output, avgLeftTop, avgLeftBot, Scalar(0, 0, 255), 3, LINE_AA);
+		line(overlay, avgLeftTop, avgLeftBot, Scalar(0, 0, 255), 3, LINE_AA);
 	}
 
 	if (numRight > 0)
@@ -198,11 +200,11 @@ void HoughTransform(Mat frame, const Mat orig)
 		avgRightTop.y = sumRightTopy / numRight;
 		avgRightBot.x = sumRightBotx / numRight;
 		avgRightBot.y = sumRightBoty / numRight;
-		line(output, avgRightTop, avgRightBot, Scalar(255, 255, 0), 3, LINE_AA);
+		line(overlay, avgRightTop, avgRightBot, Scalar(255, 255, 0), 3, LINE_AA);
 	}
 
 	// Show results
-	imshow("Hough Line Transform", output);
+	imshow("Hough Line Transform", orig);
 
 	if (isImageDemo)
 	{
