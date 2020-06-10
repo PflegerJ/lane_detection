@@ -12,21 +12,33 @@
 using namespace cv;
 using namespace std;
 
-void StartVideoDemo();
+void VideoDemo();
+void ImageDemo();
 void CannyEdgeDetect(Mat);
 void HoughTransform(Mat);
+
+bool isImageDemo = false;
 
 int main()
 {
     cout << "Press any key to end a demo.\n";
 
-	StartVideoDemo();
+	VideoDemo();
+	
+	ImageDemo();
 
 	return 0;
 
 }
 
-void StartVideoDemo()
+void ImageDemo()
+{
+	Mat src = imread(samples::findFile("image.jpg"), IMREAD_COLOR);
+	isImageDemo = true;
+	CannyEdgeDetect(src);
+}
+
+void VideoDemo()
 {
 	Mat frame;
 	VideoCapture cap;
@@ -134,4 +146,9 @@ void HoughTransform(Mat frame)
 
 	// Show results
 	imshow("Hough Line Transform", output);
+
+	if (isImageDemo)
+	{
+		waitKey(0);
+	}
 }
