@@ -14,8 +14,8 @@ using namespace std;
 
 void VideoDemo();
 void ImageDemo();
-void CannyEdgeDetect(Mat);
-void HoughTransform(Mat);
+void CannyEdgeDetect(Mat, const Mat);
+void HoughTransform(Mat, const Mat);
 
 bool isImageDemo = false;
 
@@ -35,7 +35,7 @@ void ImageDemo()
 {
 	Mat src = imread(samples::findFile("image.jpg"), IMREAD_COLOR);
 	isImageDemo = true;
-	CannyEdgeDetect(src);
+	CannyEdgeDetect(src, src);
 }
 
 void VideoDemo()
@@ -65,7 +65,11 @@ void VideoDemo()
 		// Show live and wait for a key with timeout long enough to show images
 		imshow("Live", frame);
 		
-		CannyEdgeDetect(frame);
+		//CannyEdgeDetect(frame);
+
+		Mat croppedFrame = frame(Rect(0, frame.rows / 2, frame.cols, frame.rows / 2));
+
+		CannyEdgeDetect(croppedFrame, frame);
 
 		if (waitKey(33) >= 0)  // 30 fps
 			break;
@@ -74,12 +78,7 @@ void VideoDemo()
 	// The camera is deinitialized automatically in VideoCapture destructor
 }
 
-int lowThreshold = 80;  // The bigger the number, the less edges detected
-int const max_lowThreshold = 100;
-int iratio = 3;
-int kernel_size = 3;
-
-void CannyEdgeDetect(Mat frame)
+void CannyEdgeDetect(Mat frame, const Mat orig)
 {
 	Mat input_gray;
 	Mat output;
@@ -95,18 +94,22 @@ void CannyEdgeDetect(Mat frame)
 	/// Reduce noise with a kernel 3x3
 	blur(input_gray, detected_edges, Size(3, 3));
 
+	int lowThreshold = 80;  // The bigger the number, the less edges detected
+	int ratio = 3;
+	int kernel_size = 3;
+
 	/// Canny detector
-	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * iratio, kernel_size);
+	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * ratio, kernel_size);
 
 	/// Using Canny's output as a mask, we display our result
 	output = Scalar::all(0);
 
 	input_gray.copyTo(output, detected_edges);
 
-	HoughTransform(output);
+	HoughTransform(output, orig);
 }
 
-void HoughTransform(Mat frame)
+void HoughTransform(Mat frame, const Mat orig)
 {
 	// Declare the output variables
 	Mat output;
@@ -122,7 +125,10 @@ void HoughTransform(Mat frame)
 
 	// Standard Hough Line Transform
 	vector<Vec2f> lines; // will hold the results of the detection
-	HoughLines(frame, lines, 1, CV_PI / 180, 250, 0, 0); // runs the actual detection
+	double rho = 2;  // Larger rho = two values might end up in the same bucket = more lines (because more buckets have a large vote count)
+	double theta = CV_PI / 180;  // Larger theta = fewer calculations = fewer accumulator columns/buckets = fewer lines found
+	int threshold = 250;
+	HoughLines(frame, lines, rho, theta, threshold, 0, 0); // runs the actual detection
 
 	// Draw the lines
 	for (size_t i = 0; i < lines.size(); i++)
