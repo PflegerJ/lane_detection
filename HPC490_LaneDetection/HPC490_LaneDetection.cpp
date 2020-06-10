@@ -15,6 +15,7 @@ using namespace std;
 void videoPlaybackDemo();
 void cannyFrame(Mat);
 void CannyThreshold(int, void*, Mat, Mat&);
+void hough(Mat);
 
 int main()
 {
@@ -80,7 +81,6 @@ void cannyFrame(Mat frame)
 	CannyThreshold(0, 0, src_gray, dst);
 }
 
-int edgeThresh = 1;
 int lowThreshold = 80;  // The bigger the number, the less edges detected
 int const max_lowThreshold = 100;
 int iratio = 3;
@@ -99,9 +99,49 @@ void CannyThreshold(int, void*, Mat input, Mat& output)
 	/// Using Canny's output as a mask, we display our result
 	output = Scalar::all(0);
 
-	//src.copyTo(output, detected_edges);
 	input.copyTo(output, detected_edges);
 
-	imshow("Canny Threshold Test", output);
+	hough(output);
 
+	//imshow("Canny Threshold Test", output);
+
+}
+
+void hough(Mat frame)
+{
+	// Declare the output variables
+	Mat output;
+
+	// DST = FRAME
+	// CDST = output
+
+	// Check if image is loaded fine
+	if (frame.empty()) {
+		printf(" Error opening image\n");
+		return;
+	}
+
+	// Copy edges to the images that will display the results in BGR
+	cvtColor(frame, output, COLOR_GRAY2BGR);
+
+	// Standard Hough Line Transform
+	vector<Vec2f> lines; // will hold the results of the detection
+	HoughLines(frame, lines, 1, CV_PI / 180, 250, 0, 0); // runs the actual detection
+
+	// Draw the lines
+	for (size_t i = 0; i < lines.size(); i++)
+	{
+		float rho = lines[i][0], theta = lines[i][1];
+		Point pt1, pt2;
+		double a = cos(theta), b = sin(theta);
+		double x0 = a * rho, y0 = b * rho;
+		pt1.x = cvRound(x0 + 1000 * (-b));
+		pt1.y = cvRound(y0 + 1000 * (a));
+		pt2.x = cvRound(x0 - 1000 * (-b));
+		pt2.y = cvRound(y0 - 1000 * (a));
+		line(output, pt1, pt2, Scalar(0, 0, 255), 3, LINE_AA);
+	}
+
+	// Show results
+	imshow("Hough Line Transform", output);
 }
