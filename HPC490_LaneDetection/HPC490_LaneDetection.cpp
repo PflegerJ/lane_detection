@@ -12,22 +12,21 @@
 using namespace cv;
 using namespace std;
 
-void videoPlaybackDemo();
-void cannyFrame(Mat);
-void CannyThreshold(int, void*, Mat, Mat&);
-void hough(Mat);
+void StartVideoDemo();
+void CannyEdgeDetect(Mat);
+void HoughTransform(Mat);
 
 int main()
 {
     cout << "Press any key to end a demo.\n";
 
-	videoPlaybackDemo();
+	StartVideoDemo();
 
 	return 0;
 
 }
 
-void videoPlaybackDemo()
+void StartVideoDemo()
 {
 	Mat frame;
 	VideoCapture cap;
@@ -54,7 +53,7 @@ void videoPlaybackDemo()
 		// Show live and wait for a key with timeout long enough to show images
 		imshow("Live", frame);
 		
-		cannyFrame(frame);
+		CannyEdgeDetect(frame);
 
 		if (waitKey(33) >= 0)  // 30 fps
 			break;
@@ -63,35 +62,26 @@ void videoPlaybackDemo()
 	// The camera is deinitialized automatically in VideoCapture destructor
 }
 
-void cannyFrame(Mat frame)
-{
-	Mat src_gray;
-	Mat dst;
-
-	/// Create a matrix of the same type and size as src (for dst)
-	dst.create(frame.size(), frame.type());
-
-	/// Convert the image to grayscale
-	cvtColor(frame, src_gray, CV_BGR2GRAY);
-
-	/// Create a window
-	//namedWindow("Canny Frame Test", CV_WINDOW_AUTOSIZE);
-
-	/// Show the image
-	CannyThreshold(0, 0, src_gray, dst);
-}
-
 int lowThreshold = 80;  // The bigger the number, the less edges detected
 int const max_lowThreshold = 100;
 int iratio = 3;
 int kernel_size = 3;
 
-void CannyThreshold(int, void*, Mat input, Mat& output)
+void CannyEdgeDetect(Mat frame)
 {
+	Mat input_gray;
+	Mat output;
+
+	/// Create a matrix of the same type and size as src (for dst)
+	output.create(frame.size(), frame.type());
+
+	/// Convert the image to grayscale
+	cvtColor(frame, input_gray, CV_BGR2GRAY);
+
 	Mat detected_edges; 
 
 	/// Reduce noise with a kernel 3x3
-	blur(input, detected_edges, Size(3, 3));
+	blur(input_gray, detected_edges, Size(3, 3));
 
 	/// Canny detector
 	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * iratio, kernel_size);
@@ -99,15 +89,12 @@ void CannyThreshold(int, void*, Mat input, Mat& output)
 	/// Using Canny's output as a mask, we display our result
 	output = Scalar::all(0);
 
-	input.copyTo(output, detected_edges);
+	input_gray.copyTo(output, detected_edges);
 
-	hough(output);
-
-	//imshow("Canny Threshold Test", output);
-
+	HoughTransform(output);
 }
 
-void hough(Mat frame)
+void HoughTransform(Mat frame)
 {
 	// Declare the output variables
 	Mat output;
