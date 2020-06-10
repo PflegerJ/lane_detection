@@ -125,10 +125,27 @@ void HoughTransform(Mat frame, const Mat orig)
 
 	// Standard Hough Line Transform
 	vector<Vec2f> lines; // will hold the results of the detection
-	double rho = 2;  // Larger rho = two values might end up in the same bucket = more lines (because more buckets have a large vote count)
+	double rho = 2.5;  // Larger rho = two values might end up in the same bucket = more lines (because more buckets have a large vote count)
 	double theta = CV_PI / 180;  // Larger theta = fewer calculations = fewer accumulator columns/buckets = fewer lines found
 	int threshold = 250;
 	HoughLines(frame, lines, rho, theta, threshold, 0, 0); // runs the actual detection
+
+	Point avgLeftTop;
+	Point avgLeftBot;
+	Point avgRightTop;
+	Point avgRightBot;
+
+	int numLeft = 0;
+	int sumLeftTopx = 0;
+	int sumLeftTopy = 0;
+	int sumLeftBotx = 0;
+	int sumLeftBoty = 0;
+
+	int numRight = 0;
+	int sumRightTopx = 0;
+	int sumRightTopy = 0;
+	int sumRightBotx = 0;
+	int sumRightBoty = 0;
 
 	// Draw the lines
 	for (size_t i = 0; i < lines.size(); i++)
@@ -146,8 +163,42 @@ void HoughTransform(Mat frame, const Mat orig)
 
 		// Ensure the lines are within a reasonable bound
 		if (abs(slope) > 0.5 && abs(slope) < 5)
-			line(output, pt1, pt2, Scalar(0, 0, 255), 2, LINE_AA);
+		{
+			if (slope < 0)
+			{
+				numLeft++;
+				sumLeftTopx += pt1.x;
+				sumLeftTopy += pt1.y;
+				sumLeftBotx += pt2.x;
+				sumLeftBoty += pt2.y;
+			}
+			else
+			{
+				numRight++;
+				sumRightTopx += pt1.x;
+				sumRightTopy += pt1.y;
+				sumRightBotx += pt2.x;
+				sumRightBoty += pt2.y;
+			}
+		}
+	}
 
+	if (numLeft > 0)
+	{
+		avgLeftTop.x = sumLeftTopx / numLeft;
+		avgLeftTop.y = sumLeftTopy / numLeft;
+		avgLeftBot.x = sumLeftBotx / numLeft;
+		avgLeftBot.y = sumLeftBoty / numLeft;
+		line(output, avgLeftTop, avgLeftBot, Scalar(0, 0, 255), 2, LINE_AA);
+	}
+
+	if (numRight > 0)
+	{
+		avgRightTop.x = sumRightTopx / numRight;
+		avgRightTop.y = sumRightTopy / numRight;
+		avgRightBot.x = sumRightBotx / numRight;
+		avgRightBot.y = sumRightBoty / numRight;
+		line(output, avgRightTop, avgRightBot, Scalar(255, 255, 0), 2, LINE_AA);
 	}
 
 	// Show results
