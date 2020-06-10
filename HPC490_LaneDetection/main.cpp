@@ -99,9 +99,6 @@ void HoughTransform(Mat frame)
 	// Declare the output variables
 	Mat output;
 
-	// DST = FRAME
-	// CDST = output
-
 	// Check if image is loaded fine
 	if (frame.empty()) {
 		printf(" Error opening image\n");
