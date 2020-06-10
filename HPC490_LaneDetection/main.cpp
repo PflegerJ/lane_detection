@@ -191,7 +191,7 @@ void HoughTransform(Mat frame, const Mat orig)
 		avgLeftTop.y = sumLeftTopy / numLeft;
 		avgLeftBot.x = sumLeftBotx / numLeft;
 		avgLeftBot.y = sumLeftBoty / numLeft;
-		line(overlay, avgLeftTop, avgLeftBot, Scalar(0, 0, 255), 3, LINE_AA);
+		line(overlay, avgLeftTop, avgLeftBot, Scalar(0, 0, 255), 10, LINE_AA);
 	}
 
 	if (numRight > 0)
@@ -200,7 +200,7 @@ void HoughTransform(Mat frame, const Mat orig)
 		avgRightTop.y = sumRightTopy / numRight;
 		avgRightBot.x = sumRightBotx / numRight;
 		avgRightBot.y = sumRightBoty / numRight;
-		line(overlay, avgRightTop, avgRightBot, Scalar(255, 255, 0), 3, LINE_AA);
+		line(overlay, avgRightTop, avgRightBot, Scalar(255, 0, 255), 10, LINE_AA);
 	}
 
 	// Show results
