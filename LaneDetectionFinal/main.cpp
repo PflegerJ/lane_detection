@@ -2,9 +2,6 @@
 
 
 #include <iostream>
-#include "ed_error.h"
-#include "ed_args.h"
-#include "imgMgr.hpp"
 #include "cannyEdgeDetector.hpp"
 #include "canny.h"
 #include <opencv2/core/core.hpp>
@@ -23,16 +20,20 @@ void ImageDemo();
 void CannyEdgeDetect(Mat, const Mat);
 void HoughTransform(Mat, const Mat);
 
+void para();
+pixel_t* mat_To_Pixel(Mat sourceImage);
 bool isImageDemo = false;
 
 int main()
 {
 	cout << "Press any key to end a demo.\n";
 
-	VideoDemo();
+	//VideoDemo();
 
-	ImageDemo();
+	//ImageDemo();
 
+
+	para();
 	return 0;
 
 }
@@ -220,16 +221,16 @@ void HoughTransform(Mat frame, const Mat orig)
 
 
 
-void para(Mat sourceImage)
+void para()
 {
-
+	Mat src = imread(samples::findFile("yes.jpg"), IMREAD_COLOR);
 	//std::shared_ptr<ImgMgr> img_mgr = std::make_shared<ImgMgr>(*argv);
 
-	pixel_t* pixel_array = mat_To_Pixel(sourceImage);
+	pixel_t* pixel_array = mat_To_Pixel(src);
 
 
-	//img_mgr->read_image(args.inFile);
-	CannyEdgeDetector ced(pixel_array);
+	CannyEdgeDetector ced(pixel_array, src.rows, src.cols);
+	ced.detect_edges(false);
 }
 
 
@@ -240,7 +241,8 @@ pixel_t* mat_To_Pixel(Mat sourceImage)
 
 	for (int i = 0; i < sourceImage.rows; i++)
 	{
-		uint8_t* rowPtr = sourceImage.row(i);
+		uint8_t* rowPtr = sourceImage.row(i).data;
+		//uint8_t* rowPtr = sourceImage.row(i);
 
 		for (int j = 0; j < sourceImage.cols; j++)
 		{
@@ -249,6 +251,23 @@ pixel_t* mat_To_Pixel(Mat sourceImage)
 			pixel_array[i + j].blue = rowPtr[j * cn + 0]; // B
 		}
 	}
+
+	return pixel_array;
+	/*
+	
+	// We iterate over all pixels of the image
+    for(int r = 0; r < image.rows; r++) {
+        // We obtain a pointer to the beginning of row r
+        cv::Vec3b* ptr = image.ptr<cv::Vec3b>(r);
+
+        for(int c = 0; c < image.cols; c++) {
+            // We invert the blue and red values of the pixel
+            ptr[c] = cv::Vec3b(ptr[c][2], ptr[c][1], ptr[c][0]);
+        }
+    }
+	
+	*/
+
 }
 
 

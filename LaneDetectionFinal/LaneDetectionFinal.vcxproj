@@ -85,14 +85,10 @@
     <ClInclude Include="canny.h" />
     <ClInclude Include="cannyEdgeDetector.hpp" />
     <ClInclude Include="edgeDetector.hpp" />
-    <ClInclude Include="ed_args.h" />
-    <ClInclude Include="ed_error.h" />
-    <ClInclude Include="imgMgr.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cannyEdgeDetector.cpp" />
     <ClCompile Include="edgeDetector.cpp" />
-    <ClCompile Include="imgMgr.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

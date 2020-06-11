@@ -19,7 +19,8 @@
 class CannyEdgeDetector : public EdgeDetector
 {
 public:
-    CannyEdgeDetector(pixel_t* pixel_array, std::shared_ptr<ImgMgr> image);
+    CannyEdgeDetector();
+    CannyEdgeDetector(pixel_t* pixel_array, int row, int col);
     ~CannyEdgeDetector();
 
     void detect_edges(bool serial);

@@ -10,6 +10,9 @@
 #define _ED_PIXEL_H_
 
 #include <stdint.h>
+
+
+
 typedef int8_t pixel_channel_t_signed;
 #define pixel_channel_t uint8_t
 

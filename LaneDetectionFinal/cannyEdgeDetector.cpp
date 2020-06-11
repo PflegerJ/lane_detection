@@ -18,11 +18,24 @@
 #include "cannyEdgeDetector.hpp"
 #include "canny.h"
 
-CannyEdgeDetector::CannyEdgeDetector(pixel_t* pixel_array, std::shared_ptr<ImgMgr> image)
-    : EdgeDetector(image)
+#define M_PI 3.14159265359
+
+pixel_t* orig_pixels;
+int r;
+int c;
+
+CannyEdgeDetector::CannyEdgeDetector()
+{}
+
+CannyEdgeDetector::CannyEdgeDetector(pixel_t* p_array, int row, int col)
 {
+   // int p_l
+    orig_pixels = p_array;
     /* a strong edge is the largest value a channel can hold */
     m_edge = EDGE;
+
+    r = row;
+    c = col;
 }
 
 CannyEdgeDetector::~CannyEdgeDetector(void)
@@ -36,10 +49,10 @@ CannyEdgeDetector::~CannyEdgeDetector(void)
 ///
 void CannyEdgeDetector::detect_edges(bool serial)
 {
-    pixel_t* orig_pixels = m_image_mgr->getPixelHandle();
-    unsigned input_pixel_length = m_image_mgr->getPixelCount();
-    int rows = m_image_mgr->getImgHeight();
-    int cols = m_image_mgr->getImgWidth();
+   // pixel_t* orig_pixels = m_image_mgr->getPixelHandle();
+    unsigned input_pixel_length = r * c;
+    int rows = r;
+    int cols = c;
 
     double kernel[KERNEL_SIZE][KERNEL_SIZE];
     populate_blur_kernel(kernel);
@@ -109,8 +122,8 @@ void CannyEdgeDetector::detect_edges(bool serial)
 ///
 void CannyEdgeDetector::apply_gaussian_filter(pixel_t* out_pixels, pixel_t* in_pixels, double kernel[KERNEL_SIZE][KERNEL_SIZE])
 {
-    int rows = m_image_mgr->getImgHeight();
-    int cols = m_image_mgr->getImgWidth();
+    int rows = r;//m_image_mgr->getImgHeight();
+    int cols = c; // m_image_mgr->getImgWidth();
     double kernelSum;
     double redPixelVal;
     double greenPixelVal;
@@ -150,8 +163,8 @@ void CannyEdgeDetector::apply_gaussian_filter(pixel_t* out_pixels, pixel_t* in_p
 ///
 void CannyEdgeDetector::compute_intensity_gradient(pixel_t* in_pixels, pixel_channel_t_signed* deltaX_channel, pixel_channel_t_signed* deltaY_channel, unsigned max_pixel_cnt)
 {
-    unsigned offset = m_image_mgr->getImgWidth();
-    unsigned parser_length = m_image_mgr->getImgHeight();
+    unsigned offset = c; // m_image_mgr->getImgWidth();
+    unsigned parser_length = r; // m_image_mgr->getImgHeight();
     unsigned idx;
     pixel_t_signed* deltaX = new pixel_t_signed[max_pixel_cnt];
     pixel_t_signed* deltaY = new pixel_t_signed[max_pixel_cnt];
@@ -227,8 +240,8 @@ void CannyEdgeDetector::compute_intensity_gradient(pixel_t* in_pixels, pixel_cha
 void CannyEdgeDetector::magnitude(pixel_channel_t_signed* deltaX, pixel_channel_t_signed* deltaY, pixel_channel_t* out_pixel, unsigned max_pixel_cnt)
 {
     unsigned idx;
-    unsigned offset = m_image_mgr->getImgWidth();
-    unsigned parser_length = m_image_mgr->getImgHeight();
+    unsigned offset = c; // m_image_mgr->getImgWidth();
+    unsigned parser_length = r; // m_image_mgr->getImgHeight();
 
     //computation
     idx = 0;
@@ -249,8 +262,8 @@ void CannyEdgeDetector::magnitude(pixel_channel_t_signed* deltaX, pixel_channel_
 void CannyEdgeDetector::suppress_non_max(pixel_channel_t* mag, pixel_channel_t_signed* deltaX, pixel_channel_t_signed* deltaY, pixel_channel_t* nms)
 {
     unsigned t = 0;
-    unsigned offset = m_image_mgr->getImgWidth();
-    unsigned parser_length = m_image_mgr->getImgHeight();
+    unsigned offset = c; // m_image_mgr->getImgWidth();
+    unsigned parser_length = r;// m_image_mgr->getImgHeight();
     float alpha;
     float mag1, mag2;
     const pixel_channel_t SUPPRESSED = 0;
@@ -376,11 +389,11 @@ void CannyEdgeDetector::apply_hysteresis(pixel_channel_t* out_pixels, pixel_chan
 {
     /* skip first and last rows and columns, since we'll check them as surrounding neighbors of
      * the adjacent rows and columns */
-    unsigned offset = m_image_mgr->getImgWidth();
-    unsigned parser_length = m_image_mgr->getImgHeight();
+    unsigned offset = c; // m_image_mgr->getImgWidth();
+    unsigned parser_length = r; // m_image_mgr->getImgHeight();
     for (unsigned i = 1; i < parser_length - 1; i++) {
         for (unsigned j = 1; j < offset - 1; j++) {
-            unsigned t = (m_image_mgr->getImgWidth() * i) + j;
+            unsigned t = (c * i) + j;
             /* if our input is above the high threshold and the output hasn't already marked it as an edge */
             if (out_pixels[t] != m_edge) {
                 if (in_pixels[t] > t_high) {
@@ -447,10 +460,10 @@ void CannyEdgeDetector::trace_immed_neighbors(pixel_channel_t* out_pixels, pixel
     unsigned nw, ne, sw, se;
 
     /* get indices */
-    n = idx - m_image_mgr->getImgWidth();
+    n = idx - c; // m_image_mgr->getImgWidth();
     nw = n - 1;
     ne = n + 1;
-    s = idx + m_image_mgr->getImgWidth();
+    s = idx + c; // m_image_mgr->getImgWidth();
     sw = s - 1;
     se = s + 1;
     w = idx - 1;
