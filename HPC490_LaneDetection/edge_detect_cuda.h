@@ -1,5 +1,5 @@
-#ifndef _BEBYCUDA_H_
-#define _BEBYCUDA_H_
+#ifndef _EDCUDA_H_
+#define _EDCUDA_H_
 
 #include <stdio.h>
 #include <string.h>

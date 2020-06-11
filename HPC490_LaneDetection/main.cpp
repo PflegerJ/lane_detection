@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "bebycuda.h"
+#include "edge_detect_cuda.h"
 
 using namespace cv;
 using namespace std;
@@ -23,7 +23,7 @@ void HoughTransform(Mat, const Mat);
 
 enum EdgeDetection { ed_Canny, ed_CUDA };
 
-const EdgeDetection edgeDetectionMode = EdgeDetection::ed_CUDA;  // Adjust this to do either the Canny or CUDA Edge Detection
+const EdgeDetection edgeDetectionMode = EdgeDetection::ed_Canny;  // Adjust this to do either the Canny or CUDA Edge Detection
 
 bool isImageDemo = false;
 

@@ -14,7 +14,7 @@
 
 
 
-#include "bebycuda.h"
+#include "edge_detect_cuda.h"
 
 
 #define _USE_MATH_DEFINES

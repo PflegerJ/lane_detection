@@ -20,14 +20,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="bebycuda.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="bebycuda.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ed_pixel.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="edge_detect_cuda.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="edge_detect_cuda.cu" />
   </ItemGroup>
 </Project>
