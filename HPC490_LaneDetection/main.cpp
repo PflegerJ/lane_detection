@@ -16,9 +16,14 @@ using namespace std;
 
 void VideoDemo();
 void ImageDemo();
+void EdgeDetect(Mat, const Mat);
 void CudaEdgeDetect(Mat, const Mat);
 void CannyEdgeDetect(Mat, const Mat);
 void HoughTransform(Mat, const Mat);
+
+enum EdgeDetection { ed_Canny, ed_CUDA };
+
+const EdgeDetection edgeDetectionMode = EdgeDetection::ed_CUDA;  // Adjust this to do either the Canny or CUDA Edge Detection
 
 bool isImageDemo = false;
 
@@ -41,9 +46,7 @@ void ImageDemo()
 
 	Mat croppedFrame = src(Rect(0, src.rows / 2, src.cols, src.rows / 2));
 
-	//CannyEdgeDetect(croppedFrame, src);
-	CudaEdgeDetect(croppedFrame, src);
-
+	EdgeDetect(croppedFrame, src);
 }
 
 void VideoDemo()
@@ -70,22 +73,29 @@ void VideoDemo()
 			cerr << "ERROR! blank frame grabbed\n";
 			break;
 		}
-		// Show live and wait for a key with timeout long enough to show images
-		//imshow("Live", frame);
-		
-		//CannyEdgeDetect(frame);
 
 		Mat croppedFrame = frame(Rect(0, frame.rows / 2, frame.cols, frame.rows / 2));
 
-		//CannyEdgeDetect(croppedFrame, frame);
-		CudaEdgeDetect(croppedFrame, frame);
-
+		EdgeDetect(croppedFrame, frame);
 
 		if (waitKey(33) >= 0)  // 30 fps
 			break;
 	}
 
 	// The camera is deinitialized automatically in VideoCapture destructor
+}
+
+// Run either Canny or CUDA edge detection
+void EdgeDetect(Mat frame, const Mat orig)
+{
+	if (edgeDetectionMode == EdgeDetection::ed_Canny)
+	{
+		CannyEdgeDetect(frame, orig);
+	}
+	else
+	{
+		CudaEdgeDetect(frame, orig);
+	}
 }
 
 void CudaEdgeDetect(Mat frame, const Mat orig)
@@ -96,13 +106,13 @@ void CudaEdgeDetect(Mat frame, const Mat orig)
 	int rows = frame.rows;
 	int cols = frame.cols;
 
-	Mat test_output(frame.rows, frame.cols, CV_8UC1);
+	Mat output(frame.rows, frame.cols, CV_8UC1);
 
-	cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols);
+	cu_detect_edges((pixel_channel_t*)output.data, orig_pixels, rows, cols);
 
-	imshow("wow", test_output);
+	imshow("CUDA Edge Detection", output);
 
-	HoughTransform(test_output, orig);
+	HoughTransform(output, orig);
 }
 
 void CannyEdgeDetect(Mat frame, const Mat orig)
@@ -132,6 +142,8 @@ void CannyEdgeDetect(Mat frame, const Mat orig)
 	output = Scalar::all(0);
 
 	input_gray.copyTo(output, detected_edges);
+
+	imshow("Canny Edge Detection", output);
 
 	HoughTransform(output, orig);
 }
