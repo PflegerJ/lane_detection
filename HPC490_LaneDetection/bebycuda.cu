@@ -544,12 +544,12 @@ void cu_detect_edges(pixel_channel_t* final_pixels, pixel_t* orig_pixels, int ro
 	std::cout << std::endl;
 
 	std::cout << "Total Canny Time: " << totalTime << " ms" << std::endl;
-	/*std::cout << "Gaussian Time: " << gaussianTime << " ms" << std::endl;
+	std::cout << "Gaussian Time: " << gaussianTime << " ms" << std::endl;
 	std::cout << "Gradient Time: " << gradientTime << " ms" << std::endl;
 	std::cout << "Magnitude Time: " << magnitudeTime << " ms" << std::endl;
 	std::cout << "Non-Max Suppression Time: " << nonMaxTime << " ms" << std::endl;
 	std::cout << "Hysteresis High-Threshold Time: " << hysteresisHighTime << " ms" << std::endl;
-	std::cout << "Hysteresis Low-Threshold Time: " << hysteresisLowTime << " ms" << std::endl;*/
+	std::cout << "Hysteresis Low-Threshold Time: " << hysteresisLowTime << " ms" << std::endl;
 
 	std::cout << std::endl;
 	std::cout << std::endl;
