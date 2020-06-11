@@ -56,14 +56,7 @@ void ImageDemo()
 
 	cout << test_output.step;
 
-	//pixel_channel_t* single_channel_buf0 = new pixel_channel_t[input_pixel_length];
-
-	//double kernel[KERNEL_SIZE][KERNEL_SIZE];
-	//populate_blur_kernel(kernel);
-
-	//cu_detect_edges(single_channel_buf0, orig_pixels, rows, cols, kernel);
 	cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols);
-	//cu_test_hysteresis((pixel_channel_t*)graySrc.data, (pixel_channel_t*)test_output.data, rows, cols);
 
 	imshow("wow orig", src);
 
