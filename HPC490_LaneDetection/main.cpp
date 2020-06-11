@@ -16,6 +16,7 @@ using namespace std;
 
 void VideoDemo();
 void ImageDemo();
+void CudaEdgeDetect(Mat, const Mat);
 void CannyEdgeDetect(Mat, const Mat);
 void HoughTransform(Mat, const Mat);
 
@@ -25,7 +26,7 @@ int main()
 {
     cout << "Press any key to end a demo.\n";
 
-	//VideoDemo();
+	VideoDemo();
 	
 	ImageDemo();
 
@@ -37,25 +38,12 @@ void ImageDemo()
 {
 	Mat src = imread(samples::findFile("image.jpg"), IMREAD_COLOR);
 	isImageDemo = true;
-	//CannyEdgeDetect(src, src);
 
-	pixel_t* orig_pixels = (pixel_t*)src.data;
+	Mat croppedFrame = src(Rect(0, src.rows / 2, src.cols, src.rows / 2));
 
-	unsigned input_pixel_length = src.rows * src.cols;
-	int rows = src.rows;
-	int cols = src.cols;
+	//CannyEdgeDetect(croppedFrame, src);
+	CudaEdgeDetect(croppedFrame, src);
 
-	Mat test_output(src.rows, src.cols, CV_8UC1);
-
-	cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols);
-
-	imshow("wow orig", src);
-
-	//cvtColor(test_output, test_output, COLOR_BGR2RGB);
-
-	imshow("wow", test_output);
-
-	waitKey(0);
 }
 
 void VideoDemo()
@@ -89,13 +77,32 @@ void VideoDemo()
 
 		Mat croppedFrame = frame(Rect(0, frame.rows / 2, frame.cols, frame.rows / 2));
 
-		CannyEdgeDetect(croppedFrame, frame);
+		//CannyEdgeDetect(croppedFrame, frame);
+		CudaEdgeDetect(croppedFrame, frame);
+
 
 		if (waitKey(33) >= 0)  // 30 fps
 			break;
 	}
 
 	// The camera is deinitialized automatically in VideoCapture destructor
+}
+
+void CudaEdgeDetect(Mat frame, const Mat orig)
+{
+	pixel_t* orig_pixels = (pixel_t*)frame.data;
+
+	unsigned input_pixel_length = frame.rows * frame.cols;
+	int rows = frame.rows;
+	int cols = frame.cols;
+
+	Mat test_output(frame.rows, frame.cols, CV_8UC1);
+
+	cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols);
+
+	imshow("wow", test_output);
+
+	HoughTransform(test_output, orig);
 }
 
 void CannyEdgeDetect(Mat frame, const Mat orig)
