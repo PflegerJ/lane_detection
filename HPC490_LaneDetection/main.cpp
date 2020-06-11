@@ -18,6 +18,7 @@ void VideoDemo();
 void ImageDemo();
 void CannyEdgeDetect(Mat, const Mat);
 void HoughTransform(Mat, const Mat);
+void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE]);
 
 bool isImageDemo = false;
 
@@ -27,26 +28,7 @@ int main()
 
 	//VideoDemo();
 	
-	//ImageDemo();
-
-	float* A;
-	float* B;
-	float* C;
-	int n = 16 * 10;  // n x n matrix
-	size_t mem_size = n * n * sizeof(float);
-
-	A = (float*)malloc(mem_size);
-	B = (float*)malloc(mem_size);
-	C = (float*)malloc(mem_size);
-
-	for (int i = 0; i < n * n; i++) {
-		A[i] = i;
-		B[i] = i + 1;
-		C[i] = 0.0f;
-	}
-
-	optimizedMMcuda(A, B, C, n);
-
+	ImageDemo();
 
 	return 0;
 
@@ -56,7 +38,71 @@ void ImageDemo()
 {
 	Mat src = imread(samples::findFile("image.jpg"), IMREAD_COLOR);
 	isImageDemo = true;
-	CannyEdgeDetect(src, src);
+	//CannyEdgeDetect(src, src);
+
+	pixel_t* orig_pixels = (pixel_t*)src.data;
+
+	cout << src.step << endl;
+
+	unsigned input_pixel_length = src.rows * src.cols;
+	int rows = src.rows;
+	int cols = src.cols;
+
+	Mat graySrc(src.rows, src.cols, CV_8UC1);
+	cvtColor(src, graySrc, COLOR_BGR2GRAY);
+	//imshow("gray src", graySrc);
+
+	Mat test_output(src.rows, src.cols, CV_8UC1, Scalar(128));
+
+	cout << test_output.step;
+
+	//pixel_channel_t* single_channel_buf0 = new pixel_channel_t[input_pixel_length];
+
+	double kernel[KERNEL_SIZE][KERNEL_SIZE];
+	populate_blur_kernel(kernel);
+
+	//cu_detect_edges(single_channel_buf0, orig_pixels, rows, cols, kernel);
+	//cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols, kernel);
+	cu_test_hysteresis((pixel_channel_t*)graySrc.data, (pixel_channel_t*)test_output.data, rows, cols);
+	
+	imshow("wow orig", src);
+
+	//cvtColor(test_output, test_output, COLOR_BGR2RGB);
+
+	imshow("wow", test_output);
+
+	waitKey(0);
+}
+
+void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE])
+{
+	double scaleVal = 1;
+	double stDev = (double)KERNEL_SIZE / 3;
+
+	for (int i = 0; i < KERNEL_SIZE; ++i) {
+		for (int j = 0; j < KERNEL_SIZE; ++j) {
+			double xComp = pow((i - KERNEL_SIZE / 2), 2);
+			double yComp = pow((j - KERNEL_SIZE / 2), 2);
+
+			double stDevSq = pow(stDev, 2);
+			double pi = CV_PI;
+
+			//calculate the value at each index of the Kernel
+			double kernelVal = exp(-(((xComp)+(yComp)) / (2 * stDevSq)));
+			kernelVal = (1 / (sqrt(2 * pi)*stDev)) * kernelVal;
+
+			//populate Kernel
+			out_kernel[i][j] = kernelVal;
+
+			if (i == 0 && j == 0)
+			{
+				scaleVal = out_kernel[0][0];
+			}
+
+			//normalize Kernel
+			out_kernel[i][j] = out_kernel[i][j] / scaleVal;
+		}
+	}
 }
 
 void VideoDemo()
