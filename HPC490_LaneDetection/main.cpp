@@ -18,7 +18,6 @@ void VideoDemo();
 void ImageDemo();
 void CannyEdgeDetect(Mat, const Mat);
 void HoughTransform(Mat, const Mat);
-//void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE]);
 
 bool isImageDemo = false;
 
@@ -42,19 +41,11 @@ void ImageDemo()
 
 	pixel_t* orig_pixels = (pixel_t*)src.data;
 
-	cout << src.step << endl;
-
 	unsigned input_pixel_length = src.rows * src.cols;
 	int rows = src.rows;
 	int cols = src.cols;
 
-	Mat graySrc(src.rows, src.cols, CV_8UC1);
-	cvtColor(src, graySrc, COLOR_BGR2GRAY);
-	//imshow("gray src", graySrc);
-
 	Mat test_output(src.rows, src.cols, CV_8UC1);
-
-	cout << test_output.step;
 
 	cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols);
 
@@ -66,38 +57,7 @@ void ImageDemo()
 
 	waitKey(0);
 }
-/*
-void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE])
-{
-	double scaleVal = 1;
-	double stDev = (double)KERNEL_SIZE / 3;
 
-	for (int i = 0; i < KERNEL_SIZE; ++i) {
-		for (int j = 0; j < KERNEL_SIZE; ++j) {
-			double xComp = pow((i - KERNEL_SIZE / 2), 2);
-			double yComp = pow((j - KERNEL_SIZE / 2), 2);
-
-			double stDevSq = pow(stDev, 2);
-			double pi = CV_PI;
-
-			//calculate the value at each index of the Kernel
-			double kernelVal = exp(-(((xComp)+(yComp)) / (2 * stDevSq)));
-			kernelVal = (1 / (sqrt(2 * pi)*stDev)) * kernelVal;
-
-			//populate Kernel
-			out_kernel[i][j] = kernelVal;
-
-			if (i == 0 && j == 0)
-			{
-				scaleVal = out_kernel[0][0];
-			}
-
-			//normalize Kernel
-			out_kernel[i][j] = out_kernel[i][j] / scaleVal;
-		}
-	}
-}
-*/
 void VideoDemo()
 {
 	Mat frame;
