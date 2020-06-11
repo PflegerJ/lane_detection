@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "bebycuda.h"
+
 using namespace cv;
 using namespace std;
 
@@ -23,9 +25,28 @@ int main()
 {
     cout << "Press any key to end a demo.\n";
 
-	VideoDemo();
+	//VideoDemo();
 	
-	ImageDemo();
+	//ImageDemo();
+
+	float* A;
+	float* B;
+	float* C;
+	int n = 16 * 10;  // n x n matrix
+	size_t mem_size = n * n * sizeof(float);
+
+	A = (float*)malloc(mem_size);
+	B = (float*)malloc(mem_size);
+	C = (float*)malloc(mem_size);
+
+	for (int i = 0; i < n * n; i++) {
+		A[i] = i;
+		B[i] = i + 1;
+		C[i] = 0.0f;
+	}
+
+	optimizedMMcuda(A, B, C, n);
+
 
 	return 0;
 
