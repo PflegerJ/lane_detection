@@ -21,7 +21,7 @@
 #include <math.h>
 #include <iostream>
 #define RGB2GRAY_CONST_ARR_SIZE 3
-#define STRONG_EDGE 255          // White single channel pixel value
+#define STRONG_EDGE 250          // White single channel pixel value
 #define NON_EDGE 0               // Black single channel pixel value
 
  //*****************************************************************************************
@@ -434,7 +434,7 @@ void cu_detect_edges(pixel_channel_t* final_pixels, pixel_t* orig_pixels, int ro
 	int num_blks = (rows * cols) / 1024;
 	int thd_per_blk = 1024;
 	int grid = 0;
-	pixel_channel_t t_high = 30;           // High threshold for hysteresis
+	pixel_channel_t t_high = 10;           // High threshold for hysteresis
 	pixel_channel_t t_low = t_high / 3;     // Low threshold ratio 3:1
 
 	// Create a blur kernel
