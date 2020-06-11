@@ -18,7 +18,7 @@ void VideoDemo();
 void ImageDemo();
 void CannyEdgeDetect(Mat, const Mat);
 void HoughTransform(Mat, const Mat);
-void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE]);
+//void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE]);
 
 bool isImageDemo = false;
 
@@ -52,19 +52,19 @@ void ImageDemo()
 	cvtColor(src, graySrc, COLOR_BGR2GRAY);
 	//imshow("gray src", graySrc);
 
-	Mat test_output(src.rows, src.cols, CV_8UC1, Scalar(128));
+	Mat test_output(src.rows, src.cols, CV_8UC1);
 
 	cout << test_output.step;
 
 	//pixel_channel_t* single_channel_buf0 = new pixel_channel_t[input_pixel_length];
 
-	double kernel[KERNEL_SIZE][KERNEL_SIZE];
-	populate_blur_kernel(kernel);
+	//double kernel[KERNEL_SIZE][KERNEL_SIZE];
+	//populate_blur_kernel(kernel);
 
 	//cu_detect_edges(single_channel_buf0, orig_pixels, rows, cols, kernel);
-	//cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols, kernel);
-	cu_test_hysteresis((pixel_channel_t*)graySrc.data, (pixel_channel_t*)test_output.data, rows, cols);
-	
+	cu_detect_edges((pixel_channel_t*)test_output.data, orig_pixels, rows, cols);
+	//cu_test_hysteresis((pixel_channel_t*)graySrc.data, (pixel_channel_t*)test_output.data, rows, cols);
+
 	imshow("wow orig", src);
 
 	//cvtColor(test_output, test_output, COLOR_BGR2RGB);
@@ -73,7 +73,7 @@ void ImageDemo()
 
 	waitKey(0);
 }
-
+/*
 void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE])
 {
 	double scaleVal = 1;
@@ -104,7 +104,7 @@ void populate_blur_kernel(double out_kernel[KERNEL_SIZE][KERNEL_SIZE])
 		}
 	}
 }
-
+*/
 void VideoDemo()
 {
 	Mat frame;
